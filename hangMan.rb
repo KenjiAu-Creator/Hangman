@@ -7,6 +7,16 @@ class HangMan
     play_hangman
   end
   
+  def intro
+    puts "Welcome to the game Hangman!"
+    puts "The computer has randomly selected a 5 to 12 letter word."
+    puts "Your goal is to guess what the word is with only 6 mistakes."
+    puts "A single turn is comprised of you guessing a single letter."
+    puts "You can also attempt to guess the entire word instead of a letter"
+    puts "Any wrong attempt results in a single mistake!"
+    puts "============================================================================================"
+  end
+  
   def pick_random_word
     dictionary = "5desk.txt"
     file = File.open(dictionary, "r")
