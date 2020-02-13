@@ -1,10 +1,15 @@
-class HangMan 
+class HangMan
+  require 'erb'
+  @@game_id = 0
+
   def initialize
-    pick_random_word
-    refactor_code(@expand_code)
-    initialize_board
-    puts @expand_code
-    play_hangman
+    @@game_id += 1
+    save_template = File.read "save_template.erb"
+    @erb_template = ERB.new save_template
+
+    intro
+    new_or_load
+
   end
   
   def intro
@@ -26,11 +31,15 @@ class HangMan
     random_number = rand(word_list.length)
     @code = word_list[random_number].downcase
 
-    @expand_code = ""
-    @code.each_char do |char|
-      @expand_code += "#{char} "
+    if @code.length >= 5
+      @expand_code = ""
+      @code.each_char do |char|
+        @expand_code += "#{char} "
+      end
+      @code_array = @expand_code.split("")
+    else
+      pick_random_word
     end
-    @code_array = @expand_code.split("")
 
   end
 
@@ -115,6 +124,7 @@ class HangMan
   def play_hangman
     gameOver = false
     while @number_of_guesses != 0 || !gameOver
+      save_choice
       guess = player_turn
       check_code(guess)
       if win_condition
@@ -130,6 +140,84 @@ class HangMan
     end
 
   end
+
+  def save_choice
+    puts "======================================================"
+    puts "Would you like to first save your game?"
+    choice = gets.chomp
+    if choice == "yes"
+      save_game
+    elsif choice == "no"
+      return
+    else
+      puts "Invalid choice"
+    end
+  end
+
+  def save_game
+    Dir.mkdir("Saves") unless Dir.exists?("Saves")
+
+    file_name = "Saves/save_file_#{@@game_id}"
+
+    save_file = @erb_template.result(binding)
+    File.open(file_name, 'w') do |file|
+        file.puts save_file
+    end
+  end
+
+  def new_or_load
+    puts "Would you like to play a new game or load a previous one?"
+    choice = gets.chomp.downcase
+    if choice == "new"
+        new_game
+    elsif choice == "load"
+        load_choice
+    else
+        puts "Invalid choice"
+        new_or_load
+    end
+  end
+
+  def new_game
+    pick_random_word
+    refactor_code(@expand_code)
+    initialize_board
+    play_hangman
+    puts @expand_code
+  end
+
+  def load_choice
+    puts "Which save file would you like to load?"
+    puts "Save files:"
+    Dir.entries("Saves").select do |f| 
+        if (!File.directory? f)
+            puts f 
+        end
+    end
+
+    load_chosen = gets.chomp.downcase
+    if File.exist? load_chosen
+      extract_load_data(load_chosen)
+      update_board
+      play_hangman
+    else
+      puts "Error file not found"
+      puts "======================================================"
+      load_choice
+    end
+  end
+
+  def extract_load_data(load_choice)
+    load_file = File.open("Saves/#{load_choice}", 'r')
+    read_load = load_file.readlines
+    @letter_bank = read_load[4]
+    @blank_code = read_load[6]
+    @expand_code = read_load[8]
+    @code = read_load[9]
+    @code_array = @expand_code.split("")
+    @number_of_guesses = read_load[11].to_i
+  end
+
 end
 
-HangMan::new
+b = HangMan.new

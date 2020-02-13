@@ -1,0 +1,16 @@
+save_template = %{
+    <html>
+    <head>
+    <p>Letter bank</p>
+     b c d  f g h  j k l m n o p q r s t u v w x y z
+    <p>Code so far</p>
+    _ e _ e _ _ _ _ _ _ i _ _ 
+    <p>Secret code</p>
+    m e t e o r o l o g i s t 
+    meteorologist
+    <p>Number of guesses</p>
+    5
+
+    </head>
+    </html>
+}
