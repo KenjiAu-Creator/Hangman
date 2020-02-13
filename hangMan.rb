@@ -196,7 +196,7 @@ class HangMan
     end
 
     load_chosen = gets.chomp.downcase
-    if File.exist? load_chosen
+    if File.exist? "Saves/#{load_chosen}"
       extract_load_data(load_chosen)
       update_board
       play_hangman
